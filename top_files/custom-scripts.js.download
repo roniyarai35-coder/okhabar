@@ -1,0 +1,331 @@
+//#################### PROFILE CANDIDATE CAROUSEL##
+//##################################################
+document.querySelectorAll(".okel-carousel-container").forEach((container) => {
+  const track = container.querySelector(".carousel-track");
+  const prevBtn = container.querySelector(".prev-btn");
+  const nextBtn = container.querySelector(".next-btn");
+  const items = container.querySelectorAll(".carousel-item");
+
+  // Get visibleItems from data attribute, default to 4 if not specified
+  const visibleItems = Number(container.dataset.visibleItems) || 4;
+
+  let currentIndex = 0;
+  const totalItems = items.length;
+  const maxIndex = totalItems - visibleItems;
+
+  function updateCarousel() {
+    const gap = 20;
+
+    // Correct calculation: subtract total gap space from 100%, then divide
+    items.forEach((item) => {
+      item.style.width = `calc((100% - ${(visibleItems - 1) * gap}px) / ${visibleItems})`;
+    });
+
+    if (!items.length) {
+      return;
+    }
+
+    const itemWidth = items[0].offsetWidth;
+    const offset = currentIndex * (itemWidth + gap);
+    track.style.transform = `translateX(-${offset}px)`;
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= maxIndex;
+  }
+
+  prevBtn.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCarousel();
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (currentIndex < maxIndex) {
+      currentIndex++;
+      updateCarousel();
+    }
+  });
+
+  window.addEventListener("resize", updateCarousel);
+  updateCarousel();
+});
+//#################### END PROFILE CANDIDATE CAROUSEL##
+//##################################################
+
+//################# FUnction onclick scroll to ID###
+//################# FUnction onclick scroll to ID###
+function scrollToSection(id, offset = 0) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const y = el.getBoundingClientRect().top + window.pageYOffset - offset;
+  window.scrollTo({
+    top: y,
+    behavior: "smooth",
+  });
+}
+
+const quickNavItem = document.querySelectorAll(".quickItem");
+quickNavItem.forEach((item) => {
+  item.addEventListener("click", function () {
+    quickNavItem.forEach((i) => i.classList.remove("active"));
+    this.classList.add("active");
+  });
+});
+
+//######################## Ends
+
+//####################### Rating Star Active rating
+//####################### Rating Star Active rating
+// document.querySelectorAll(".stars-wrapper").forEach((starsContainer) => {
+//   const stars = starsContainer.querySelectorAll(".overall-rating-item");
+//   let selectedRating = 0;
+
+//   stars.forEach((star, index) => {
+//     star.addEventListener("mouseenter", () => {
+//       highlight(index + 1);
+//     });
+
+//     star.addEventListener("mouseleave", () => {
+//       highlight(selectedRating);
+//     });
+
+//     star.addEventListener("click", () => {
+//       selectedRating = index + 1;
+//       highlight(selectedRating);
+//     });
+//   });
+
+//   function highlight(rating) {
+//     stars.forEach((s, i) => {
+//       s.classList.toggle("active", i < rating);
+//     });
+//   }
+// });
+//################ Ends
+
+//############### Rate Now Popup######
+//############### Rate Now Popup######
+// const ratingPopupCloseButton = document.querySelector("#closePopupModel");
+// const buttonSubmitRatings = document.querySelector("#submitRatings");
+// const ratingPopupModel = document.querySelector("#candidateRatingPopup");
+// const activeStars = document.querySelectorAll(".overall-rating-item");
+// const buttonOpenRatingModel = document.querySelectorAll(
+//   ".action-open-rating-popup",
+// );
+
+// if (ratingPopupCloseButton && ratingPopupModel) {
+//   ratingPopupCloseButton.addEventListener("click", () => {
+//     ratingPopupModel.classList.remove("active-model");
+//   });
+// }
+
+// if (buttonSubmitRatings) {
+//   buttonSubmitRatings.addEventListener("click", () => {
+//     ratingPopupModel.classList.remove("active-model");
+//     activeStars.forEach((item) => {
+//       item.classList.remove("active");
+//     });
+//   });
+// }
+
+// buttonOpenRatingModel.forEach((btn, indx) => {
+//   btn.addEventListener("click", () => {
+//     ratingPopupModel.classList.add("active-model");
+//   });
+// });
+
+
+
+jQuery(document).ready(function ($) {
+  $("body").on("submit", ".okel-home-directory-filter-form", function (e) {
+    e.preventDefault();
+    var form = $(this);
+
+    $.ajax({
+      type: "get",
+      url: okel_front_js_obj.ajax_url,
+      data: form.serialize() + "&action=get_home_candidate_directory_block",
+      beforeSend: function () {
+        form.css("opacity", "0.6");
+      },
+      success: function (res) {
+        var nextBlock = $(res).filter("#okel-home-candidate-directory-block");
+        if (!nextBlock.length) {
+          nextBlock = $(res).find("#okel-home-candidate-directory-block");
+        }
+        if (nextBlock.length) {
+          $("#okel-home-candidate-directory-block").replaceWith(nextBlock);
+        }
+      },
+      complete: function () {
+        form.css("opacity", "");
+      },
+    });
+  });
+
+  $("body").on(
+    "change",
+    ".okel-home-directory-filter-form select",
+    function () {
+      $(this).closest(".okel-home-directory-filter-form").trigger("submit");
+    }
+  );
+
+  $("body").on("click", ".okel-home-directory-reset", function () {
+    var form = $(this).closest(".okel-home-directory-filter-form");
+    form.find("select").val("");
+    form.trigger("submit");
+  });
+
+  $("body").on("click", ".okel-home-directory-load-more", function (e) {
+    e.preventDefault();
+    var btn = $(this);
+    var block = btn.closest("#okel-home-candidate-directory-block");
+    var form = block.find(".okel-home-directory-filter-form");
+    var nextPage = Number(btn.data("next-page") || 2);
+
+    $.ajax({
+      type: "get",
+      url: okel_front_js_obj.ajax_url,
+      data:
+        form.serialize() +
+        "&cd_page=" +
+        nextPage +
+        "&action=get_home_candidate_directory_block",
+      beforeSend: function () {
+        btn.prop("disabled", true).text("Loading...");
+      },
+      success: function (res) {
+        var nextBlock = $(res).filter("#okel-home-candidate-directory-block");
+        if (!nextBlock.length) {
+          nextBlock = $(res).find("#okel-home-candidate-directory-block");
+        }
+        if (!nextBlock.length) {
+          return;
+        }
+
+        var newRows = nextBlock.find(".okel-home-directory-tbody").html();
+        if (newRows) {
+          block.find(".okel-home-directory-tbody").append(newRows);
+        }
+
+        var nextBtn = nextBlock.find(".okel-home-directory-load-more");
+        if (nextBtn.length) {
+          btn.data("next-page", nextBtn.data("next-page"));
+          btn.prop("disabled", false).text("Load More..");
+        } else {
+          btn.closest("div").remove();
+        }
+      },
+      error: function () {
+        btn.prop("disabled", false).text("Load More..");
+      },
+    });
+  });
+
+  $("body").on("change", ".okel-state-filter", function () {
+    var selector = $(this);
+    var state_id = $(this).val();
+    var filterWrap = selector.closest(".okel-filter-wrap");
+    var chetraSelect = filterWrap.find(".okel-chetra-filter");
+
+    if (chetraSelect.length) {
+      chetraSelect.html('<option value="">क्षेत्र:</option>');
+    }
+
+    if (state_id == "") {
+      var api_url = okel_front_js_obj.api_url + "/all-districts/";
+    } else {
+      var api_url = okel_front_js_obj.api_url + "/state-districts/" + state_id;
+    }
+    $.get(api_url, function (res, status) {
+      var options_html = '<option value="">जिल्ला</option>';
+      if (res.status == 200 && res.data.districts) {
+        for (i = 0; i < res.data.districts.length; i++) {
+          options_html +=
+            '<option value="' +
+            res.data.districts[i].district_id +
+            '">' +
+            res.data.districts[i].district_name +
+            "</option>";
+        }
+        selector
+          .closest(".okel-filter-wrap")
+          .find(".okel-district-filter")
+          .html(options_html);
+      }
+    });
+  });
+
+  $("body").on("change", ".okel-district-filter", function () {
+    var selector = $(this);
+    var filterWrap = selector.closest(".okel-filter-wrap");
+    var action = filterWrap.data("action");
+    var district_id = selector.val();
+    var ajax_url = okel_front_js_obj.ajax_url;
+    var chetraSelect = filterWrap.find(".okel-chetra-filter");
+
+    if (chetraSelect.length) {
+      chetraSelect.html('<option value="">क्षेत्र:</option>');
+      if (district_id !== "") {
+        var chetraApiUrl =
+          okel_front_js_obj.api_url + "/district-chetras/" + district_id;
+        $.get(chetraApiUrl, function (res) {
+          var chetraOptionsHtml = '<option value="">क्षेत्र:</option>';
+          if (res.status == 200 && res.data.chetras) {
+            for (i = 0; i < res.data.chetras.length; i++) {
+              if (!res.data.chetras[i].center_chetra_map_id) {
+                continue;
+              }
+              chetraOptionsHtml +=
+                '<option value="' +
+                res.data.chetras[i].center_chetra_map_id +
+                '">' +
+                res.data.chetras[i].center_chetra_name +
+                "</option>";
+            }
+          }
+          chetraSelect.html(chetraOptionsHtml);
+        });
+      }
+    }
+
+    if (filterWrap.hasClass("okel-area-filter")) {
+      selector.closest("form").submit();
+      return;
+    }
+
+    if (!action) {
+      return;
+    }
+
+    $.ajax({
+      type: "get",
+      url: ajax_url,
+      data: {
+        district_id: district_id,
+        action: action,
+      },
+      beforeSend: function () { },
+      success: function (res) {
+        $(".okel-candidates-lists").html(res);
+      },
+    });
+  });
+
+  $("body").on("change", ".okel-chetra-filter", function () {
+    var chetraMapId = $(this).val();
+    if (!chetraMapId) {
+      return;
+    }
+
+    var filterWrap = $(this).closest(".okel-filter-wrap");
+    var redirectBase = filterWrap.data("chetra-redirect-base");
+    if (!redirectBase) {
+      redirectBase = okel_front_js_obj.site_url + "/central-chetra";
+    }
+
+    window.location.href =
+      redirectBase.replace(/\/$/, "") + "/" + chetraMapId;
+  });
+});

@@ -3,8 +3,73 @@
     margin:0;
 }
 body{
-    background-color:beige
+    background-color:skyblue
 }
 .top header{
-    background-color:bisque
+    background-color:rgb(255, 255, 255)
+}
+.election 
+{
+    background-color: aqua;
+}
+.etable{
+    width: 700px;
+    height: 700px;
+    margin-top: 30px;
+    margin-left: 30px;
+    background-color: blue;
+    height:100px;
+    border-collapse:collapse ;
+}
+.esymbol img{
+    width:50px;
+    height:50px;
+    border-radius:50px;
+}
+
+
+.logo{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
+    width: 50px;
+}
+
+.etable th{
+    width: 200px;
+    border: 2px  solid black;
+}
+.etable tr,td {
+    border: 2px solid red;
+}
+
+.relative{
+    position: relative;
+    height: 20px;
+    width: 150px;
+    background-color: white;
+    margin-left: 10px;
+}
+.perc{
+    margin-left: 110px;
+    color: pink;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.absolute{
+    position: absolute;
+    height: 20px;
+    width: 100px;
+    left:0px;
+    top: 0px;
+    background-color: green;
+}
+
+ .ab  {
+    background-color: brown;
+    display: inline;
+    justify-content: center; 
+    /*  How to make td on each th.  */
 }
